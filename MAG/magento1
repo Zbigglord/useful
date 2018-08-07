@@ -1,0 +1,21 @@
+Z powodu błędu w wysiwigu dodaje bzdurne adresy do obrazków jeśli dynamiczne adresy są włączone. Wobec tego należy zmienić : SYSTEM->KONFIGURACJA->ZARZĄDZANIE ZAWARTOŚCIĄ : WYSIWIG : STATYCZNE ADRESY na TAK
+a następnie zmienić kod źródłowy: adres strony/app/code/core/Mage/cms/helper/Wysiwyg/Images:
+    public function getImageHtmlDeclaration($filename, $renderAsTag = false)
+    {
+        $fileurl = $this->getCurrentUrl() . $filename;
+        $mediaPath = str_replace(Mage::getBaseUrl('media'), '', $fileurl);
+        $directive = sprintf('{{media url="%s"}}', $mediaPath);
+        if ($renderAsTag) {
+            $html = sprintf('<img src="%s" alt="" />', $this->isUsingStaticUrlsAllowed() ? $fileurl : $directive);
+        } else {
+            if ($this->isUsingStaticUrlsAllowed()) {
+			//Zbigg - due to wysiwig bug, must replace code <tutaj>
+                $html = $this->getBaseUrl().''.$mediaPath;
+			//<koniec tutaj>	
+            } else {
+                $directive = Mage::helper('core')->urlEncode($directive);
+                $html = Mage::helper('adminhtml')->getUrl('*/cms_wysiwyg/directive', array('___directive' => $directive));
+            }
+        }
+        return $html;
+    }
