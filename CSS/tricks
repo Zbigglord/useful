@@ -1,0 +1,55 @@
+radiobuton + label positioning:
+1.put input first than label in one div
+2.give input some id an than giv it float:left and margin-right: 10px
+==============================================================================================
+keeping border inside div:
+.most-viewed-list:hover, .most-viewed-list:focus{
+    -webkit-box-shadow:inset 0 0 0 3px #1E6313;
+    -moz-box-shadow:inset 0 0 0 3px #1E6313;
+    box-shadow:inset 0 0 0 3px #1E6313;
+}
+==============================================================================================
+CENTROWANIE TEXTU W RAMCE
+
+<div class="ramka">
+ <span>Długi lub krótki text blablalblalskjhkshdg;skhdjg; </span>
+</div>
+CSS:
+.ramka{
+	text-align: center;
+	border: 5px solid #bdc9ca;
+	padding: 10px;
+	width: 100%;
+	min-height: 200px;
+	line-height: 200px;<!-- this one must be set
+}
+.ramka > span
+{
+	display: inline-block;
+	vertical-align: middle;
+	line-height: 22px; /* <-- adjust this */
+}
+=============================================================================================
+obcinanie obrazków w CSS
+<div class="image-holder">
+ <img class="image-class">
+</div>
+------------ css
+.image-holder{
+ position: relative;
+}
+.image-class{
+  position: absolute;
+  max-width:370px;//max-width: dowolny
+  clip: rect(0px 370px 240px 0px);
+}
+===========================================================================
+łamanie długiej listy (ul) na kolumny:
+ul {
+    -moz-column-count: 4;
+    -moz-column-gap: 20px;
+    -webkit-column-count: 4;
+    -webkit-column-gap: 20px;
+    column-count: 4;
+    column-gap: 20px;
+}
