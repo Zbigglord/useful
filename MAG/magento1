@@ -122,3 +122,53 @@ foreach ($children as $child) {
 }
 
 return $html;
+
+//================================================== CODE FOR MOST VIEWED ===========================================
+ 
+<div class="page-header-holder">
+	<h3 class="main-header-h3">Najczęściej wybierane produkty</h3>
+</div>
+<?php  // MOST VIEWED PRODUCTS
+        $storeId    = Mage::app()->getStore()->getId();
+        $products = Mage::getResourceModel('reports/product_collection')
+            ->addOrderedQty()
+            ->addAttributeToSelect('*')
+            ->addAttributeToSelect(array('name', 'price', 'small_image'))
+            ->setStoreId($storeId)
+            ->addStoreFilter($storeId)
+            ->addViewsCount();
+        Mage::getSingleton('catalog/product_status')->addVisibleFilterToCollection($products);
+        Mage::getSingleton('catalog/product_visibility')->addVisibleInCatalogFilterToCollection($products);
+ 
+        $products->setPageSize(4)->setCurPage(1);
+        $this->setProductCollection($products);
+
+?>
+<?php if (($_products = $this->getProductCollection()) && $_products->getSize()): ?>
+<div class=" most_viewed">
+<div class="row">
+<?php $_collectionSize = 4;//count($_products->getItems()); echo $_collectionSize; ?>
+
+<?php $i=1; foreach ($_products->getItems() as $_product): ?>
+<div class="col-lg-3" style="padding: 0;">
+    <div class="most-viewed-list <?php if($i%4==0 or $i==$_collectionSize){echo 'mvl-last';} ?> ">	                    
+     
+                <a href="<?php echo $_product->getProductUrl() ?>" title="<?php echo $this->stripTags($this->getImageLabel($_product, 'small_image'), null, true) ?>" class="product-image">
+                    <?php $_imgSize = 210; ?>
+                    <img class="img-responsive prod-list-image" id="product-collection-image_<?php echo $_product->getId(); ?>"
+                         src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image'); ?>"
+                         alt="<?php echo $this->stripTags($this->getImageLabel($_product, 'small_image'), null, true) ?>" />
+                </a>
+			<div class="prod-list-buttons-block" id="buttons-block_<?php echo $_product->getId(); ?>">
+			<button class="btn-add-to-card-prod-list" onclick="setLocation('<?php echo $this->helper('checkout/cart')->getAddUrl($_product); ?>')"></button>
+			</div>
+            <p class="product-name-prod-list"><?php echo $this->htmlEscape($_product->getName()) ?></p>
+                      
+             <p class="product-price-prod-list"><?php echo number_format($_product->getPrice($_product, true),2); ?><span class="list-pln"> PLN</span></p>
+    </div>
+</div>
+<?php if($i%4==0){echo '</div>';} ?> 
+<?php $i++; endforeach; $kol = $_collectionSize; ?>
+</div><!-- end row -->
+</div><!-- end most viewed -->
+<!-- END MOST VIEWED PRODUCTS -->	
