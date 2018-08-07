@@ -19,3 +19,106 @@ a następnie zmienić kod źródłowy: adres strony/app/code/core/Mage/cms/helpe
         }
         return $html;
     }
+//================================================================================================================
+KONTAKT CODE for CMS PAGE:
+{{block type="core/template" name="contactForm" form_action="/contacts/index/post" template="contacts/form.phtml"}}
+//====================================================================================================================
+zaplecze obrazek do zamówienia path:
+/app/design/adminhtml/default/default/template/sales/
+//=======================================================================================================================
+TOP MENU: 
+change layout:
+            <block type="core/text_list" name="top.menu" as="topMenu" translate="label">
+                <label>Navigation Bar</label>
+                <block type="page/html_topmenu" name="catalog.topnav" template="page/html/topmenu.phtml">
+                 <block type="page/html_topmenu_renderer" name="catalog.topnav.renderer" template="page/html/topmenu/renderer.phtml"/>
+                </block>
+            </block>
+
+path template: page/html/topmenu.phtml - code:
+----------------------------------------------
+<?php $_menu = $this->getHtml('level-top') ?>
+<?php if($_menu): ?>
+<nav class="navbar navbar-default">
+<div class="container-fluid">
+	<div class="navbar-header">
+		<button class="navbar-toggle collapsed" aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse" type="button">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</button>
+	</div>
+<div id="navbar" class="navbar-collapse collapse">
+  <ul class="nav navbar-nav">
+	<?php echo $_menu ?>
+  </ul>
+</div>
+</div>
+</nav>
+<?php endif ?>
+path template: page/html/topmenu/renderer.phtml - code:
+-------------------------------------------------------
+$html = '';
+
+$children = $menuTree->getChildren();
+$parentLevel = $menuTree->getLevel();
+$childLevel = is_null($parentLevel) ? 0 : $parentLevel + 1;
+
+$counter = 1;
+$childrenCount = $children->count();
+
+$parentPositionClass = $menuTree->getPositionClass();
+$itemPositionClassPrefix = $parentPositionClass ? $parentPositionClass . '-' : 'nav-';
+
+foreach ($children as $child) {
+    $child->setLevel($childLevel);
+    $child->setIsFirst($counter == 1);
+    $child->setIsLast($counter == $childrenCount);
+    $child->setPositionClass($itemPositionClassPrefix . $counter);
+
+    $outermostClassCode = 'level'. $childLevel;
+    $_hasChildren = ($child->hasChildren()) ? 'has-children' : '';
+
+    //$html .= '<li '. $this->_getRenderedMenuItemAttributes($child) .'>';
+	if($_hasChildren){
+		$html .= '<li class="dropdown '.$_hasChildren.'">';
+	}else{
+	    $html .= '<li class="">';	
+	}
+    //$html .= '<a href="'. $child->getUrl() .'" class="'. $outermostClassCode .' '. $_hasChildren .'">'. $this->escapeHtml($this->__($child->getName())) .'</a>';
+	$html .= '<a class="dropdown-toggle '. $outermostClassCode .' '. $_hasChildren .'" aria-expanded="false" aria-haspopup="true" role="button" data-toggle="dropdown" href="'.$child->getUrl().'">'.$this->escapeHtml($this->__($child->getName())).'</a>';
+
+    if (!empty($childrenWrapClass)) {
+        $html .= '<div class="'. $childrenWrapClass .'">';
+    }
+
+    $nextChildLevel = $childLevel + 1;
+
+    if (!empty($_hasChildren)) {
+       // $html .= '<ul class="level'. $childLevel .'">';
+	   if($childLevel != 0){
+		   $html .= '<ul class="dropdown-menu level'. $childLevel .' dropdown-menu-to-right">';
+	   }else{
+		 $html .= '<ul class="dropdown-menu level'. $childLevel .'">';  
+	   }
+		
+       // $html .=     '<li class="level'. $nextChildLevel .' view-all">';
+       // $html .=         '<a class="level'. $nextChildLevel .'" href="'. $child->getUrl() .'">';
+       // $html .=             $this->__('View All') . ' ' . $this->escapeHtml($this->__($child->getName()));
+       // $html .=         '</a>';
+       // $html .=     '</li>';
+        $html .=     $this->render($child, $childrenWrapClass); 
+        $html .= '</ul>';
+    }
+
+    if (!empty($childrenWrapClass)) {
+        $html .= '</div>';
+    }
+
+    $html .= '</li>';
+
+    $counter++;
+}
+
+return $html;
