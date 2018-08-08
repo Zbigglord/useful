@@ -53,4 +53,61 @@
     }
 </script>
 
-//====================================================================================================
+//=========================== CAPTCHA GENERATE EXAMPLE - MAY FIT TO MAGENTO AS IT IS (of course need fonts) ================
+//============== NEED TO RELOAD CODE AS WELL  
+<?php
+ 	function generateCaptchaImage(){
+		      $image = imagecreatetruecolor(205, 50);
+		      $background_color = imagecolorallocate($image, 255, 255, 255);
+        imagefilledrectangle($image,0,0,205,50,$background_color);
+        //generate lines
+        $line_color = imagecolorallocate($image, 64,64,64);
+         for($i=0;$i<10;$i++) {
+         imageline($image,0,rand()%50,205,rand()%50,$line_color);
+         }
+         //generate dots
+         $pixel_color = imagecolorallocate($image, 0,0,255);
+          for($i=0;$i<1000;$i++) {
+           imagesetpixel($image,rand()%205,rand()%50,$pixel_color);
+         }
+         //generate letters
+         $word = '';
+         $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789';
+          $len = strlen($letters);
+         $letter = $letters[rand(0, $len-1)];
+         $font = Mage::getBaseDir('base').'/OpenSans.ttf';
+         $text_color = imagecolorallocate($image, 0,0,0);
+         for ($i = 0; $i< 6;$i++) {
+          $letter = $letters[rand(0, $len-1)];
+         $word.=$letter;
+        }
+        imagettftext($image, 26, 0, 30, 40, $text_color, $font, $word);
+         //$_SESSION['captcha_string'] = $word;
+        imagepng($image, 'captcha.png');
+        $session = Mage::getSingleton("core/session",  array("name"=>"frontend"));
+        $session->setData("captcha_string", $word);
+ 	}
+?>
+
+ <div class="row no-margin">
+ <div class="col-lg-4">
+   <img style="margin-top: 20px;" src="captcha.png" />
+	</div>
+	<div class="col-lg-2"><!-- <div id="captcha_reload">reload</div>--></div>
+	<div class="col-lg-6"></div>
+ </div>
+   <div class="row no-margin">
+   <div class="col-lg-4">
+    <p style="margin: 10px 0;">Proszę wpisać kod z obrazka:</p>
+   </div>
+   <div class="col-lg-2"></div>
+   <div class="col-lg-6"></div>
+  </div>
+ <div class="row no-margin">
+		<div class="col-lg-4">
+		  <input type="text" name="captcha_string" class="form-control input-sm formularz-obramowanie" id="captcha_string">
+  </div>
+  <div class="col-lg-8"></div>
+</div>
+//=====================================================================================
+
